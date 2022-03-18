@@ -2,17 +2,19 @@ from fastapi import FastAPI, Depends
 import psycopg2
 import uvicorn
 from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
+import os
 
 app = FastAPI()
 
 
 def get_db():
     with psycopg2.connect(
-        user="robot-startml-ro",
-        password="pheiph0hahj1Vaif",
-        host="postgres.lab.karpov.courses",
-        port=6432,
-        database="startml",
+        user=os.environ.get("POSTGRES_USER"),
+        password=os.environ.get("POSTGRES_PASSWORD"),
+        host=os.environ.get("POSTGRES_HOST"),
+        port=os.environ.get("POSTGRES_PORT"),
+        database=os.environ.get("POSTGRES_DATABASE"),
     ) as conn:
         return conn
 
@@ -31,4 +33,5 @@ def get_user(limit, conn=Depends(get_db)):
 
 
 if __name__ == '__main__':
+    load_dotenv()
     uvicorn.run(app)
