@@ -43,6 +43,24 @@ def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_
             SELECT *
             FROM feed_action
             WHERE user_id = %(user_id)s
+                AND time >= '2022-01-01'
+            LIMIT %(limit)s
+            """,
+            {"user_id": user_id, "limit": limit}
+        )
+        return cur.fetchall()
+
+
+@app.get("/user/likes")
+def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_db)):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT *
+            FROM feed_action
+            WHERE user_id = %(user_id)s
+                AND action = 'like'
+                AND time >= '2022-01-01'
             LIMIT %(limit)s
             """,
             {"user_id": user_id, "limit": limit}
