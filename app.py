@@ -23,11 +23,12 @@ def get_db():
 def get_user(limit, conn=Depends(get_db)):
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(
-            f"""
+            """
             SELECT *
             FROM "user"
-            LIMIT {limit}
-            """
+            LIMIT %(limit_users)s
+            """,
+            {"limit_users": limit}
         )
         return cur.fetchall()
 
