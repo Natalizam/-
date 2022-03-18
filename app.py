@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+import yaml
 import uvicorn
 import psycopg2
 import os
@@ -22,6 +23,11 @@ def get_db() -> cursor:
         return conn
 
 
+def config():
+    with open("params.yaml", "r") as f:
+        return yaml.safe_load(f)
+
+
 # Инъекция
 @app.get("/user")
 def get_user(limit, conn: connection = Depends(get_db)):
@@ -36,24 +42,25 @@ def get_user(limit, conn: connection = Depends(get_db)):
 
 
 @app.get("/user/feed")
-def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_db)):
+def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_db), config: dict = Depends(config)):
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT *
             FROM feed_action
             WHERE user_id = %(user_id)s
-                AND time >= '2021-12-01'
+                AND time >= %(start_date)s
             ORDER BY time 
             LIMIT %(limit)s
             """,
-            {"user_id": user_id, "limit": limit}
+            {"user_id": user_id, "limit": limit, "start_date": config["feed_start_date"]}
         )
         return cur.fetchall()
 
 
 @app.get("/user/likes")
-def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_db)):
+def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_db), config: dict = Depends(config)):
+    print(config)
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -61,11 +68,11 @@ def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_
             FROM feed_action
             WHERE user_id = %(user_id)s
                 AND action = 'like'
-                AND time >= '2021-12-01'
+                AND time >= %(start_date)s
             ORDER BY time 
             LIMIT %(limit)s
             """,
-            {"user_id": user_id, "limit": limit}
+            {"user_id": user_id, "limit": limit, "start_date": config["feed_start_date"]}
         )
         return cur.fetchall()
 
