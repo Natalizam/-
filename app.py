@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 app = FastAPI()
 
 
-def get_db():
+def get_db() -> cursor:
     # .env
     with psycopg2.connect(
         user=os.environ.get("POSTGRES_USER"),
@@ -17,6 +17,7 @@ def get_db():
         host=os.environ.get("POSTGRES_HOST"),
         port=os.environ.get("POSTGRES_PORT"),
         database=os.environ.get("POSTGRES_DATABASE"),
+        cursor_factory=RealDictCursor,
     ) as conn:
         return conn
 
@@ -24,12 +25,27 @@ def get_db():
 # Инъекция
 @app.get("/user")
 def get_user(limit, conn: connection = Depends(get_db)):
-    with conn.cursor(cursor_factory=RealDictCursor) as cur:  # type: cursor
+    with conn.cursor() as cur:  # type: cursor
         cur.execute(
             f"""
             SELECT * FROM "user" LIMIT %(limit)s
             """,
             {"limit": limit}
+        )
+        return cur.fetchall()
+
+
+@app.get("/user/feed")
+def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_db)):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT *
+            FROM feed_action
+            WHERE user_id = %(user_id)s
+            LIMIT %(limit)s
+            """,
+            {"user_id": user_id, "limit": limit}
         )
         return cur.fetchall()
 
