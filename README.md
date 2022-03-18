@@ -7,3 +7,4 @@
 - Как расширять PYTHONPATH через консоль и через sys.path.append
 - Логгирование (loguru)
 - SQL-инъекции
+- Пара слов про conventional commit
