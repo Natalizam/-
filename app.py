@@ -43,7 +43,8 @@ def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_
             SELECT *
             FROM feed_action
             WHERE user_id = %(user_id)s
-                AND time >= '2022-01-01'
+                AND time >= '2021-12-01'
+            ORDER BY time 
             LIMIT %(limit)s
             """,
             {"user_id": user_id, "limit": limit}
@@ -60,7 +61,8 @@ def get_user_feed(user_id: int, limit: int = 10, conn: connection = Depends(get_
             FROM feed_action
             WHERE user_id = %(user_id)s
                 AND action = 'like'
-                AND time >= '2022-01-01'
+                AND time >= '2021-12-01'
+            ORDER BY time 
             LIMIT %(limit)s
             """,
             {"user_id": user_id, "limit": limit}
