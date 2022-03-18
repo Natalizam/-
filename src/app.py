@@ -6,9 +6,13 @@ import os
 from psycopg2.extensions import connection, cursor
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from src.crud import get_likes, get_feed
 from pathlib import Path
+# DIRTY HACK
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+############
 
+from src.crud import get_likes, get_feed
 app = FastAPI()
 
 
