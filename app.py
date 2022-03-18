@@ -27,9 +27,9 @@ def get_user(limit, conn: connection = Depends(get_db)):
     with conn.cursor(cursor_factory=RealDictCursor) as cur:  # type: cursor
         cur.execute(
             f"""
-            SELECT * FROM "user" LIMIT {limit}
+            SELECT * FROM "user" LIMIT %(limit)s
             """,
-            # {"limit": limit}
+            {"limit": limit}
         )
         return cur.fetchall()
 
